@@ -75,6 +75,7 @@ app.appendChild(document.createElement("h1")).textContent = "Let's find the hidd
 app.appendChild(createTable());
 
 /*************************************************************************** */
+
 let startQuestion;
 setTimeout(() => {
     startQuestion = window.confirm("Let's start our game!");
@@ -82,21 +83,32 @@ setTimeout(() => {
         let madeMistake = false;
         console.log("start")
         for (let questionId in questions) {
-            let check;
-            setTimeout(() => { 
-                check = askQuestion(questions[questionId]); 
-                if (check) {
+            setTimeout(() => {
+                let check = askQuestion(questions[questionId]);
+                if (check && !madeMistake) {
                     colorPicture(pictureParts.filter((part) => part.id == Number(questionId))[0]);
-                    sleep(200);
                 }
-                else madeMistake = true;
+                else {
+                    madeMistake = true;
+                }
+                if (Number(questionId) == questions.length - 1) {
+                    if (madeMistake) alert("Let's try again!")
+                    else {
+                        const cells = document.querySelectorAll("td");
+                        for (const cell of cells) {
+                            cell.style.opacity = "1";
+                        }
+                        setTimeout(() => {alert("You did it!")},200);
+                    }
+                }
+                sleep(200);
             }, 300);
-            
-            //sleep(500);
+
+
         }
-        
+
     }
-},300);
+}, 300);
 
 // if (startQuestion) {
 //     let madeMistake = false;
@@ -126,7 +138,8 @@ function createTable() {
             const td = document.createElement("td");
             td.style.width = "20px";
             td.style.height = "20px";
-            td.style.background = "ivory";
+            td.style.background = "ivory"
+            td.style.opacity = "0.3";
             tr.appendChild(td);
         }
         table.appendChild(tr)
@@ -147,7 +160,7 @@ function colorPicture(picPart) {
     }
 }
 
-    
+
 
 function sleep(milliseconds) {
     const date = Date.now();
