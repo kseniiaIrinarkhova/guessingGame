@@ -71,74 +71,76 @@ app.style.height = 0.75 * availH;
 
 app.style.textAlign = "center"
 app.appendChild(document.createElement("h1")).textContent = "Let's find the hidden picture";
-
+//create the main gaming field - the table with hidden picture
 app.appendChild(createTable());
 
 /*************************************************************************** */
 
 let startQuestion;
 setTimeout(() => {
+    //just small timeout before the game start
     startQuestion = window.confirm("Let's start our game!");
+    //if user decided to play
     if (startQuestion) {
+        //mistake flag
         let madeMistake = false;
-        console.log("start")
+        //for each question in questions check the answers
         for (let questionId in questions) {
+            //use delay to see the result
             setTimeout(() => {
-                let check = askQuestion(questions[questionId]);
+                let check = askQuestion(questions[questionId]); //check answer
                 if (check && !madeMistake) {
+                    //paint only if all answers are correct
                     colorPicture(pictureParts.filter((part) => part.id == Number(questionId))[0]);
                 }
                 else {
+                    //raise the flag that user made a mistake
                     madeMistake = true;
                 }
+                //on the last iteration change the opacity of picture and show the information about game result
                 if (Number(questionId) == questions.length - 1) {
+                    //if user made a mistake only tell about it
                     if (madeMistake) alert("Let's try again!")
                     else {
+                        //else change opacity in pixel picture
                         const cells = document.querySelectorAll("td");
                         for (const cell of cells) {
                             cell.style.opacity = "1";
                         }
-                        setTimeout(() => {alert("You did it!")},200);
+                        //send congrats
+                        setTimeout(() => { alert("You did it!") }, 200);
                     }
                 }
+                //add aditional delay between questions
                 sleep(200);
             }, 300);
-
-
         }
-
     }
 }, 300);
 
-// if (startQuestion) {
-//     let madeMistake = false;
-//     console.log("start")
-//     for (let questionId in questions) {
-//         let check;
-//         setTimeout(() => { check = askQuestion(questions[questionId]) }, 300);
-//         if (check) {
-//             colorPicture(pictureParts.filter((part) => part.id == Number(questionId))[0]);
-//             window.top.focus();
-//             sleep(2000);
-//         }
-//         else madeMistake = true;
-//         //sleep(500);
-//     }
-//     if (madeMistake) window.alert("Try again!");
-// }
-
 /********************************************************* */
 /*****Functions******************************************* */
-
+/**
+ * Function creates main page content
+ * @returns table for DOM
+ */
 function createTable() {
+    
+    const rowsAmount = 16;
+    const colsAmount = 17; 
+
     const table = document.createElement("table");
-    for (let i = 0; i < 16; i++) {
+    
+    for (let i = 0; i < rowsAmount; i++) {
         const tr = document.createElement("tr");
-        for (let j = 0; j < 17; j++) {
+        for (let j = 0; j < colsAmount; j++) {
+            //create cell
             const td = document.createElement("td");
+            //add styling
             td.style.width = "20px";
             td.style.height = "20px";
             td.style.background = "ivory"
+            //at the begining opacity is 30%
             td.style.opacity = "0.3";
             tr.appendChild(td);
         }
@@ -148,25 +150,43 @@ function createTable() {
     return table;
 }
 
+/**
+ * Function that shows popup window with question
+ * @param {object} question 
+ * @returns answer
+ * true - if user answered correctly, false - otherwise
+ */
 function askQuestion(question) {
+    //get the answer
     let answer = window.confirm(question.question + "\nPress 'OK' if 'Yes' and 'Cancel' if 'No'!");
+    //check if answer correct and return the result
     return answer == question.answer;
 }
 
+/**
+ * Function that colors the part of the picture
+ * @param {object} picPart 
+ */
 function colorPicture(picPart) {
+    //take our table where the picture is hidden
     let table = document.querySelector("table");
+    //loop through all points in current picture part
     for (const point of picPart.points) {
+        //find cell by indexes that mentioned in point and change the background color to the color of current part
         table.childNodes[point[0]].childNodes[point[1]].style.background = picPart.color;
     }
 }
 
 
-
+/**
+ * Technic function to add the delay in js workflow
+ * @param {number} milliseconds 
+ */
 function sleep(milliseconds) {
     const date = Date.now();
     let currentDate = null;
+    //do the loop until desired amount of millisecond passed
     do {
         currentDate = Date.now();
     } while (currentDate - date < milliseconds);
 }
-
